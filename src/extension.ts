@@ -2,10 +2,6 @@ import * as vscode from 'vscode';
 import cp = require('child_process');
 import path = require('path');
 import fs = require('fs');
-import {
-  MODES,
-  ALIAS
-} from './clangMode';
 import { getBinPath } from './clangPath';
 import sax = require('sax');
 
@@ -143,10 +139,12 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
   private getExecutablePath() {
     const platform = getPlatformString();
     const config = vscode.workspace.getConfiguration('clang-format');
+    const ExecPath = config.get<object>('executable');
+    let execPath = ExecPath[platform];
 
-    const platformExecPath = config.get<string>('executable.' + platform);
-    const defaultExecPath = config.get<string>('executable');
-    let execPath = platformExecPath || defaultExecPath;
+    if (!execPath) {
+      execPath = ExecPath['default'];
+    }
 
     if (!execPath) {
       return this.defaultConfigure.executable;
@@ -156,7 +154,6 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
     if (execPath.includes('${workspaceFolder})')) {
       execPath = execPath.replace('${workspaceFolder}', this.getWorkspaceFolder());
     }
-
     return execPath
       .replace(/\${workspaceRoot}/g, vscode.workspace.rootPath)
       .replace(/\${cwd}/g, process.cwd())
@@ -166,12 +163,13 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
   }
 
   private getLanguage(document: vscode.TextDocument): string {
-    return ALIAS[document.languageId] || document.languageId;
+    return document.languageId;
   }
 
   private getStyle(document: vscode.TextDocument) {
     const config = vscode.workspace.getConfiguration('clang-format');
-    let ret = config.get<string>(`language.${this.getLanguage(document)}.style`);
+    const styleLangs = config.get<string>('style.languages');
+    let ret = styleLangs[this.getLanguage(document)];
 
     if (ret && ret.trim()) {
       ret = this.replaceStyleVariables(ret.trim(), document);
@@ -180,7 +178,7 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
       }
     }
 
-    ret = config.get<string>('style');
+    ret = config.get<string>('style.default');
     if (ret && ret.trim()) {
       ret = this.replaceStyleVariables(ret.trim(), document);
       if (ret && ret.trim()) {
@@ -193,7 +191,8 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
 
   private getFallbackStyle(document: vscode.TextDocument) {
     const config = vscode.workspace.getConfiguration('clang-format');
-    let strConf = config.get<string>(`language.${this.getLanguage(document)}.fallbackStyle`);
+    const fallbackStyleLangs = config.get<object>('fallbackStyle.languages');
+    let strConf = fallbackStyleLangs[this.getLanguage(document)];
 
     if (strConf && strConf.trim()) {
       strConf = this.replaceStyleVariables(strConf.trim(), document);
@@ -202,7 +201,7 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
       }
     }
 
-    strConf = config.get<string>('fallbackStyle');
+    strConf = config.get<string>('fallbackStyle.default');
     if (strConf && strConf.trim()) {
       strConf = this.replaceStyleVariables(strConf.trim(), document);
       if (strConf && strConf.trim()) {
@@ -362,12 +361,14 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
 
 export function activate(ctx: vscode.ExtensionContext): void {
 
+  const config = vscode.workspace.getConfiguration('clang-format');
   const formatter = new ClangDocumentFormattingEditProvider();
-  let availableLanguages = {};
+  const availableLanguages = vscode.languages.getLanguages();
+  const enabledLangs = config.get<string[]>('enabledLanguageIds');
 
-  MODES.forEach((mode) => {
+  enabledLangs.forEach((language) => {
+    let mode = { language, scheme: 'file' };
     ctx.subscriptions.push(vscode.languages.registerDocumentRangeFormattingEditProvider(mode, formatter));
     ctx.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(mode, formatter));
-    availableLanguages[mode.language] = true;
   });
 }
