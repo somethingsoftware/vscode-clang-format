@@ -33,7 +33,7 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
   private defaultConfigure = {
     executable: 'clang-format',
     style: 'file',
-    fallbackStyle: 'none',
+    fallbackStyle: 'file',
     assumeFilename: ''
   };
 
@@ -210,7 +210,7 @@ export class ClangDocumentFormattingEditProvider implements vscode.DocumentForma
       }
     }
 
-    return this.replaceStyleVariables(this.defaultConfigure.style, document);
+    return this.replaceStyleVariables(this.defaultConfigure.fallbackStyle, document);
   }
 
   private replaceStyleVariables(str: string, document: vscode.TextDocument): string {
