@@ -365,6 +365,7 @@ export function activate(ctx: vscode.ExtensionContext): void {
   const formatter = new ClangDocumentFormattingEditProvider();
   const availableLanguages = vscode.languages.getLanguages();
   const enabledLangs = config.get<string[]>('enabledLanguageIds');
+  const enabledFileTypes = config.get<string[]>('enabledFileTypes');
 
   enabledLangs.forEach((language) => {
     let mode = { language, scheme: 'file' };

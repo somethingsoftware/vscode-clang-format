@@ -104,6 +104,17 @@
           ],
           "uniqueItems": true
         },
+        "clang-format.enabledFileTypes": {
+          "order": 5,
+          "description": "Specify a list of file types to spell check.",
+          "title": "Enabled File Types",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "uniqueItems": true
+        },
         "clang-format.assumeFilename": {
           "order": 99,
           "type": "string",
