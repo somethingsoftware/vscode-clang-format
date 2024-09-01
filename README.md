@@ -79,4 +79,4 @@ LLVM contains the clang-format binary, the resulting pat for the `clang-format.e
 ```
 
 ## Source code
-Available on github: https://github.com/xaverh/vscode-clang-format-provider
+Available on github: https://github.com/somethingsoftware/vscode-clang-format
