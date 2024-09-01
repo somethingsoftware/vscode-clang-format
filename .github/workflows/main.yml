@@ -1,9 +1,9 @@
+name: Deploy Extension
 on:
   push:
-    tags:
-      - "*"
-
-name: Deploy Extension
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
