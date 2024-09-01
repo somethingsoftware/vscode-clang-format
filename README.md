@@ -2,6 +2,9 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-orange.svg)](https://github.com/somethingsoftware/vscode-clang-format/blob/master/LICENSE)
 
+[Install from vscode marketplace](https://marketplace.visualstudio.com/items?itemName=Something-Software.clang-format-2)
+
+
 [Clang-Format](http://clang.llvm.org/docs/ClangFormat.html) is a tool to format C/C++/Java/JavaScript/Objective-C/Objective-C++/Protobuf code. It can be configured with a config file named `.clang-format` within the working folder or a parent folder. Configuration see: http://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
 
